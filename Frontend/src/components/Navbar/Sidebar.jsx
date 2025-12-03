@@ -37,6 +37,27 @@ const Sidebar = () => {
           <span>🏢</span>
           <span>Room</span>
         </Link>
+        <Link
+          to="/Interview-Prep"
+          className="flex items-center space-x-2 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 rounded-md"
+        >
+          <span>🎯</span>
+          <span>Interview Prep</span>
+        </Link>
+        <Link
+          to="/Project-Hub"
+          className="flex items-center space-x-2 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 rounded-md"
+        >
+          <span>📁</span>
+          <span>Project Hub</span>
+        </Link>
+        <Link
+          to="/Road-Map-to-Tech"
+          className="flex items-center space-x-2 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 rounded-md"
+        >
+          <span>🗺️</span>
+          <span>Road Map to Tech</span>
+        </Link>
 
         <Link
           to="/leaderboard"
