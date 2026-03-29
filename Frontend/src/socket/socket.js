@@ -7,5 +7,17 @@ const socket = io(import.meta.env.VITE_BACKEND_URL,  {
   withCredentials: true,
 });
 
+export const setSocketAuthToken = (token) => {
+  socket.auth = {
+    ...socket.auth,
+    token,
+  };
+};
+
+export const disconnectSocket = () => {
+  if (socket.connected) {
+    socket.disconnect();
+  }
+};
 
 export default socket;

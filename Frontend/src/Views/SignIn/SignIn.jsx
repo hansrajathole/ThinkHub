@@ -5,6 +5,7 @@ import axios from "axios";
 import { setAuthUser } from "../../Redux/AuthSlice";
 import toast from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
+import { setSocketAuthToken } from "../../socket/socket";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const SignIn = () => {
       .then((res) => {
         const {token,user,message} = res.data;
         localStorage.setItem("token",token)
+        setSocketAuthToken(token);
 
         dispatch(setAuthUser(user));
         toast.success(message)
@@ -43,6 +45,7 @@ const SignIn = () => {
       .then((res) => {
         dispatch(setAuthUser(res.data.user));
         localStorage.setItem("token", res.data.token);
+        setSocketAuthToken(res.data.token);
         toast.success("Logged in successfully!");
         navigate("/");
       })

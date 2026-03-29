@@ -4,9 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { setAuthUser } from "../../Redux/AuthSlice";
 import icon from "../../assets/stackwaveicon.png";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 import Hamburger from "hamburger-react";
 import { toggleSidebar } from "../../Redux/sidebarSlice";
+import { disconnectSocket, setSocketAuthToken } from "../../socket/socket";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -15,6 +18,7 @@ const Navbar = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [isDarkMode, setDarkMode] = useState(false);
+  const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const savedMode = localStorage.getItem("theme");
@@ -53,10 +57,31 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleLogout = () => {
-    dispatch(setAuthUser(null));
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      if (token) {
+        await axios.post(
+          `${baseUrl}/api/auth/logout`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Logout failed on server");
+    } finally {
+      dispatch(setAuthUser(null));
+      localStorage.removeItem("token");
+      setSocketAuthToken(null);
+      disconnectSocket();
+      setDropdownOpen(false);
+      navigate("/login");
+    }
   };
 
   return (

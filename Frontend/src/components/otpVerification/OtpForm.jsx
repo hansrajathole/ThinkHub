@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser } from '../../Redux/AuthSlice';
+import { setSocketAuthToken } from '../../socket/socket';
 
 export default function OTPForm() {
   const location = useLocation();
@@ -82,6 +83,7 @@ export default function OTPForm() {
         toast.success(res.data.message);
         dispatch(setAuthUser(res.data.user));
         localStorage.setItem("token", res.data.token);
+        setSocketAuthToken(res.data.token);
         navigate("/");
       })
       .catch((err) => {

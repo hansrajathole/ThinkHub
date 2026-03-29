@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { setAuthUser } from "../../Redux/AuthSlice";
+import { setSocketAuthToken } from "../../socket/socket";
 
 
 const SignUp = () => {
@@ -37,6 +38,7 @@ const SignUp = () => {
       .then((res) => {
         const {token,user,message} = res.data;
         localStorage.setItem("token",token)
+        setSocketAuthToken(token);
         dispatch(setAuthUser(user));
         toast.success(message)
         navigate("/");
