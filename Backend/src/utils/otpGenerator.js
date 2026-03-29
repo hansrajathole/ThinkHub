@@ -5,4 +5,4 @@ const generateOTP = () => {
     
 };
   
-export default generateOTP;
+export default generateOTP; 

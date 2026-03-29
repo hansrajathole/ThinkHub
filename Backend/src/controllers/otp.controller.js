@@ -44,7 +44,7 @@ export const verifyOTP = async (req, res) => {
     // Find the OTP document
     const otpDoc = await OTP.findOne({ email, otp });
     
-    if (!otpDoc) {
+    if (!otpDoc){
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid OTP or OTP expired' 
@@ -53,7 +53,6 @@ export const verifyOTP = async (req, res) => {
     
     // OTP is valid, update user's verification status
     const user = await User.findOneAndUpdate({ email }, { isVerified: true });
-    
     // Delete the OTP document
     await OTP.deleteOne({ _id: otpDoc._id });
     const token = await user.generateToken()
