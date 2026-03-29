@@ -120,10 +120,15 @@ export const meController =  async (req, res)=>{
 }
 
 export const logoutController = async (req, res) => {
+    if (!req.tokenData?.token || !req.tokenData?.exp) {
+        return res.status(401).json({ message: "Invalid token" });
+    }
     
     const timeRemainingForToken = req.tokenData.exp * 1000 - Date.now()
-    
-    await redis.set(`blacklist: ${req.tokenData.token}`, true , "EX" ,Math.floor(timeRemainingForToken/1000))
+
+    if (timeRemainingForToken > 0) {
+        await redis.set(`blacklist:${req.tokenData.token}`, "true", "EX", Math.floor(timeRemainingForToken / 1000))
+    }
 
     res.status(200).json({message: "User logged out successfully"})
 }

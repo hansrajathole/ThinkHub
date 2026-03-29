@@ -19,6 +19,7 @@ router.post("/forget-password", userMiddleware.forgetPasswordValidator, authCont
 router.post("/verify-otp", otpController.verifyOTP);
 router.post("/resend-otp", authController.resendOTP);
 router.post('/google-login', authController.googleLoginController);
+router.post("/logout", protectRoute, authController.logoutController);
 router.get("/me", protectRoute, authController.meController);
 
 export default router;

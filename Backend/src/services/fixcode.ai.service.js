@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import config from "../config/config.js";
 const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-3-flash-preview",
     systemInstruction: `
                 You are a code assistant AI. Your task is to analyze, fix, and optimize any buggy, non-functional, or inefficient code provided to you. For each fix or change, you must:
 

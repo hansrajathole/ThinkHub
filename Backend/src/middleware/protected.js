@@ -17,6 +17,11 @@ export const protectRoute = async function (req, res, next) {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
+        const isBlacklisted = await redis.get(`blacklist:${token}`);
+        if (isBlacklisted) {
+            return res.status(401).json({ message: 'Token has been invalidated' });
+        }
+
         const user = await userModel.findById(decoded.id);
         
         if(!user) {
@@ -24,6 +29,7 @@ export const protectRoute = async function (req, res, next) {
         }
 
         req.user = user;
+        req.tokenData = { ...decoded, token };
         next();
     } catch (error) {
         console.log(error);

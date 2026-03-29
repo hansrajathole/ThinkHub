@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import config from "../config/config.js";
 const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+  model: "gemini-3-flash-preview",
   systemInstruction: `
            You are a code generation AI. Your primary task is to read the user's natural language prompt and generate clean, functional, and production-ready code based on the request.
 
