@@ -24,6 +24,19 @@ const RoomSchema = new mongoose.Schema(
         ref: "User"
       }
     ],
+    joinRequests: [
+      {
+        requestedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true
+        },
+        requestedAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
     codeContent: {
       type: String,
       default: ""

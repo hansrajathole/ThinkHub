@@ -44,6 +44,19 @@ export const joinRoom = async (roomId) => {
   }
 };
 
+export const reviewJoinRequest = async (roomId, requestId, action) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}/api/rooms/${roomId}/requests/${requestId}`,
+      { action },
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const deleteRoom = async (roomId) => {
   try {
     const response = await axios.delete(

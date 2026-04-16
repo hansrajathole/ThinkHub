@@ -41,9 +41,13 @@ const CollabEditor = () => {
     showPeople,
     setShowPeople,
     roomData,
+    isAdmin,
+    requestLoading,
+    showRequestIndicator,
     messageBoxRef,
     handleSendMessage,
-  } = useChat(roomId, userId);
+    handleReviewJoinRequest,
+  } = useChat(roomId, userId, () => navigate("/rooms"));
 
   const handleLeave = () => {
     setIsLeaveOpen(false);
@@ -92,14 +96,18 @@ const CollabEditor = () => {
           <ChatPanel
             messages={messages}
             input={input}
-            setInput={setInput}
-            showPeople={showPeople}
-            setShowPeople={setShowPeople}
-            roomData={roomData}
-            messageBoxRef={messageBoxRef}
-            currentUserId={userId}
-            onSendMessage={handleSendMessage}
-          />
+          setInput={setInput}
+          showPeople={showPeople}
+          setShowPeople={setShowPeople}
+          roomData={roomData}
+          isAdmin={isAdmin}
+          requestLoading={requestLoading}
+          showRequestIndicator={showRequestIndicator}
+          messageBoxRef={messageBoxRef}
+          currentUserId={userId}
+          onSendMessage={handleSendMessage}
+          onReviewJoinRequest={handleReviewJoinRequest}
+        />
         </div>
 
         {/* Code Editor Panel */}

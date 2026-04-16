@@ -11,15 +11,20 @@ const ChatPanel = ({
   showPeople,
   setShowPeople,
   roomData,
+  isAdmin,
+  showRequestIndicator,
+  requestLoading,
   messageBoxRef,
   currentUserId,
-  onSendMessage
+  onSendMessage,
+  onReviewJoinRequest,
 }) => {
   return (
     <div className="w-80 max-sm:w-screen h-full bg-gray-50 dark:bg-gray-900 border-r border-gray-300 dark:border-gray-800 flex flex-col relative">
       <ChatHeader 
         onTogglePeople={() => setShowPeople(!showPeople)} 
         showPeople={showPeople} 
+        showRequestIndicator={showRequestIndicator}
       />
       
       <MessageList 
@@ -37,7 +42,11 @@ const ChatPanel = ({
       <MembersPanel
         show={showPeople}
         participants={roomData?.participants}
+        joinRequests={roomData?.joinRequests}
+        isAdmin={isAdmin}
+        requestLoading={requestLoading}
         currentUserId={currentUserId}
+        onReviewJoinRequest={onReviewJoinRequest}
         onClose={() => setShowPeople(false)}
       />
     </div>

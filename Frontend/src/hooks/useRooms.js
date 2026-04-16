@@ -67,12 +67,26 @@ export const useRooms = () => {
     
     setLoading(true);
     try {
-      await roomService.joinRoom(roomId);
-      await fetchAllRooms();
-      toast.success("Joined project successfully!");
+      const response = await roomService.joinRoom(roomId);
+      toast.success(response.message || "Join request sent successfully!");
       return true;
     } catch (err) {
       toast.error(err?.response?.data?.message || "Something went wrong!");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReviewJoinRequest = async (roomId, requestId, action) => {
+    setLoading(true);
+    try {
+      const response = await roomService.reviewJoinRequest(roomId, requestId, action);
+      await fetchAllRooms();
+      toast.success(response.message || "Join request updated successfully!");
+      return true;
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to update join request!");
       return false;
     } finally {
       setLoading(false);
@@ -101,6 +115,7 @@ export const useRooms = () => {
     loading,
     handleCreateProject,
     handleJoinProject,
+    handleReviewJoinRequest,
     handleDeleteRoom
   };
 };

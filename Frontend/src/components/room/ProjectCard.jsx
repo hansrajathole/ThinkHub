@@ -1,15 +1,24 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Tippy from "@tippyjs/react";
 import DeleteButton from "../shared/DeleteButton";
+import JoinRequestsDialog from "./JoinRequestsDialog";
 
-const ProjectCard = ({ project, onDelete }) => {
+const ProjectCard = ({ project, loading, onReviewJoinRequest, onDelete }) => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+  const isAdmin = project.roomCreatedby?._id === user?._id;
+  const pendingRequests = project.joinRequests || [];
+
+  const handleReview = async (requestId, action) => {
+    await onReviewJoinRequest(project.roomId, requestId, action);
+  };
 
   return (
     <div className="relative bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg">
       {/* Delete Icon */}
-      <DeleteButton onClick={() => onDelete(project.roomId)} />
+      {isAdmin && <DeleteButton onClick={() => onDelete(project.roomId)} />}
 
       {/* Language Badge */}
       <div className="flex justify-between items-center mb-2">
@@ -69,7 +78,14 @@ const ProjectCard = ({ project, onDelete }) => {
           )}
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex items-center justify-end gap-2">
+          {isAdmin && pendingRequests.length > 0 && (
+            <JoinRequestsDialog
+              requests={pendingRequests}
+              loading={loading}
+              onReview={handleReview}
+            />
+          )}
           <button
             className="px-4 py-2 border border-blue-500 dark:text-white text-sm rounded hover:bg-blue-500 hover:shadow-md hover:shadow-blue-700 transition"
             onClick={() => navigate(`/rooms/room/${project.roomId}`)}

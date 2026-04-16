@@ -29,10 +29,9 @@ const JoinProjectDialog = ({ onJoin, loading }) => {
       </DialogTrigger>
       <DialogContent className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-6 rounded-lg w-[425px]">
         <DialogHeader>
-          <DialogTitle>Join Project</DialogTitle>
+          <DialogTitle>Request to Join</DialogTitle>
           <DialogDescription>
-            To join a project, enter the join ID, which can be obtained
-            from your friend.
+            Enter the project ID to send a join request to the room admin.
           </DialogDescription>
           <div className="flex items-center justify-between mt-4">
             <label htmlFor="project" className="text-sm font-medium">
@@ -53,7 +52,7 @@ const JoinProjectDialog = ({ onJoin, loading }) => {
               disabled={loading}
               className="bg-indigo-500 hover:bg-indigo-600 text-white transition"
             >
-              {loading ? "Joining..." : "Join Project"}
+              {loading ? "Sending..." : "Send Request"}
             </Button>
           </div>
         </DialogHeader>

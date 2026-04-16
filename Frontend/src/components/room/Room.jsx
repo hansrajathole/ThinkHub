@@ -9,6 +9,7 @@ const Room = () => {
     loading, 
     handleCreateProject, 
     handleJoinProject, 
+    handleReviewJoinRequest,
     handleDeleteRoom 
   } = useRooms();
 
@@ -21,6 +22,8 @@ const Room = () => {
       />
       <ProjectGrid 
         projects={projects} 
+        loading={loading}
+        onReviewJoinRequest={handleReviewJoinRequest}
         onDeleteRoom={handleDeleteRoom} 
       />
     </div>
