@@ -36,17 +36,11 @@ const Home = () => {
   }, [navigate, user]);
 
   return (
-    <div className="flex w-full">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-950">
       <Navbar />
+      <Sidebar />
 
-      <div className="min-h-full w-full bg-white dark:bg-gray-950 text-black dark:text-gray-200 flex">
-        {/* Sidebar */}
-        <div className={`${isOpen?"w-64":"w-0 hidden"} transition-all duration-300 ease-in-out`}>
-          <Sidebar />
-        </div>
-
-        {/* Main Content */}
-        <div className={`${isOpen ?"w-[90%]" :"w-full"} max-sm:w-full ease-in-out transition-all duration-300`}>
+      <div className={`min-h-full w-full pt-16 text-black transition-all duration-300 dark:text-gray-200 ${isOpen ? "md:pl-64" : ""}`}>
           {/* Hero Section */}
           <section className="bg-white dark:bg-gray-900 py-20 px-6 text-center shadow">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
@@ -183,7 +177,6 @@ const Home = () => {
               </ul>
             </section>
           )}
-        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Protected from "../Protected/Protecte";
 import Navbar from "../Navbar/Navbar";
@@ -12,21 +12,13 @@ import SingleQuestion from "../../Views/Question/SingleQuestion";
 import Leaderboard from "../leaderboard/Leaderboard";
 
 const MainLayout = () => {
-
-  
   const isOpen = useSelector((state) => state.sidebar.isOpen);
-    
 
   return (
-    <div className=" flex">
-      <div>
-        <Navbar />
-      </div>
-      <div className="flex justify-between w-full ">
-        <div className={`${isOpen?"w-64 ": "w-0 hidden"} transition-all duration-300 ease-in-out`}>
-          <Sidebar />
-        </div>
-        <div className={`${isOpen?"w-[90%]": "w-[100%]"} mt-10 max-sm:w-full`}>
+    <div className="min-h-screen bg-white dark:bg-gray-950">
+      <Navbar />
+      <Sidebar />
+      <div className={`w-full px-0 pt-16 transition-all duration-300 ${isOpen ? "md:pl-64" : ""}`}>
           <Routes>
             <Route
               path="/questions"
@@ -78,7 +70,6 @@ const MainLayout = () => {
               }
             />
           </Routes>
-        </div>
       </div>
     </div>
   );

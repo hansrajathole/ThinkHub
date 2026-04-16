@@ -8,7 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 import Hamburger from "hamburger-react";
-import { toggleSidebar } from "../../Redux/sidebarSlice";
+import { closeSidebar, toggleSidebar } from "../../Redux/sidebarSlice";
 import { disconnectSocket, setSocketAuthToken } from "../../socket/socket";
 const Navbar = () => {
   const navigate = useNavigate();
@@ -42,6 +42,12 @@ const Navbar = () => {
 
   const handleProfileClick = () => {
     setDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleNavigate = (path) => {
+    dispatch(closeSidebar());
+    setDropdownOpen(false);
+    navigate(path);
   };
 
   useEffect(() => {
@@ -85,9 +91,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex h-screen z-40">
-      <div className="flex-1">
-        <nav className="bg-white dark:bg-gray-900 text-black dark:text-white p-3 flex items-center justify-between fixed top-0 left-0 w-full z-50 shadow-md">
+    <nav className="fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-white p-3 text-black shadow-md dark:bg-gray-900 dark:text-white">
       
           {/* Left Section - Logo */}
           <div className="flex items-center space-x-2 text-center">
@@ -99,7 +103,7 @@ const Navbar = () => {
               />
             </span>
             <div className="flex items-center cursor-pointer" 
-            onClick={() => navigate("/")}
+            onClick={() => handleNavigate("/")}
             >
               <img src={icon} alt="" className="w-10 h-10" />
               <h1 className="text-lg">
@@ -141,13 +145,13 @@ const Navbar = () => {
                         src={user.avatar}
                         alt="profile"
                         className="w-8 h-8 rounded-full  cursor-pointer"
-                        onClick={() => navigate(`/profile/${user._id}`)}
+                        onClick={() => handleNavigate(`/profile/${user._id}`)}
                       />
                       <span className="block text-sm">{user.username}</span>
                     </div>
                     <div
                       className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                      onClick={() => navigate(`/profile/${user._id}`)}
+                      onClick={() => handleNavigate(`/profile/${user._id}`)}
                     >
                       <span>View Profile</span>
                     </div>
@@ -163,7 +167,7 @@ const Navbar = () => {
             ) : (
               <button
                 className="bg-blue-600 px-3 py-1 rounded-md text-white text-sm hover:bg-blue-700"
-                onClick={() => navigate("/login")}
+                onClick={() => handleNavigate("/login")}
               >
                 Sign in
               </button>
@@ -178,9 +182,7 @@ const Navbar = () => {
               />
             </div>
           </div>
-        </nav>
-      </div>
-    </div>
+    </nav>
   );
 };
 
