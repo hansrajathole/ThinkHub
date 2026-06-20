@@ -13,6 +13,7 @@ const CollabEditor = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const userId = user._id;
+  const username = user.username;
   const [isLeaveOpen, setIsLeaveOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("code"); // mobile toggle
 
@@ -32,12 +33,14 @@ const CollabEditor = () => {
     onEditorMount,
     isFix,
     setisFix,
-  } = useCodeEditor(roomId);
+    codingUsers,
+  } = useCodeEditor(roomId, username);
 
   const {
     messages,
     input,
     setInput,
+    handleInputChange,
     showPeople,
     setShowPeople,
     roomData,
@@ -45,9 +48,11 @@ const CollabEditor = () => {
     requestLoading,
     showRequestIndicator,
     messageBoxRef,
+    onlineUsers,
+    typingUsers,
     handleSendMessage,
     handleReviewJoinRequest,
-  } = useChat(roomId, userId, () => navigate("/rooms"));
+  } = useChat(roomId, userId, username, () => navigate("/rooms"));
 
   const handleLeave = () => {
     setIsLeaveOpen(false);
@@ -71,6 +76,7 @@ const CollabEditor = () => {
         onGenerate={handleGenerateCode}
         isFix={isFix}
         setisFix={setisFix}
+        codingUsers={codingUsers}
       />
 
       {/* Mobile Toggle Tabs */}
@@ -96,18 +102,21 @@ const CollabEditor = () => {
           <ChatPanel
             messages={messages}
             input={input}
-          setInput={setInput}
-          showPeople={showPeople}
-          setShowPeople={setShowPeople}
-          roomData={roomData}
-          isAdmin={isAdmin}
-          requestLoading={requestLoading}
-          showRequestIndicator={showRequestIndicator}
-          messageBoxRef={messageBoxRef}
-          currentUserId={userId}
-          onSendMessage={handleSendMessage}
-          onReviewJoinRequest={handleReviewJoinRequest}
-        />
+            setInput={setInput}
+            handleInputChange={handleInputChange}
+            showPeople={showPeople}
+            setShowPeople={setShowPeople}
+            roomData={roomData}
+            isAdmin={isAdmin}
+            requestLoading={requestLoading}
+            showRequestIndicator={showRequestIndicator}
+            messageBoxRef={messageBoxRef}
+            currentUserId={userId}
+            onlineUsers={onlineUsers}
+            typingUsers={typingUsers}
+            onSendMessage={handleSendMessage}
+            onReviewJoinRequest={handleReviewJoinRequest}
+          />
         </div>
 
         {/* Code Editor Panel */}

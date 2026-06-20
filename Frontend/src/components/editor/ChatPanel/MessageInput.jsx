@@ -1,11 +1,20 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 
-const MessageInput = ({ input, setInput, onSend }) => {
+const MessageInput = ({ input, setInput, handleInputChange, onSend }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSend();
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (handleInputChange) {
+      handleInputChange(value);
+    } else {
+      setInput(value);
     }
   };
 
@@ -14,7 +23,7 @@ const MessageInput = ({ input, setInput, onSend }) => {
       <input
         type="text"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         className="flex-1 px-4 py-2 rounded bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring focus:ring-blue-500"

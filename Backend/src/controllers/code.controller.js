@@ -2,10 +2,19 @@
 import axios from "axios"
 import { languageMap } from "../utils/langMap.js";
 import config from "../config/config.js";
+
 export const runCode = async (req, res) => {
   const { code, language } = req.body;
-  console.log(code , language);
-  
+
+  if (!code || !language) {
+    return res.status(400).json({ message: "Code and language are required" });
+  }
+
+  const languageId = languageMap[language];
+
+  if (!languageId) {
+    return res.status(400).json({ message: "Unsupported language selected" });
+  }
 
   const options = {
     method: 'POST',
@@ -21,22 +30,23 @@ export const runCode = async (req, res) => {
       'Content-Type': 'application/json'
     },
     data: {
-      language_id: languageMap[language],
+      language_id: languageId,
       source_code: code,
       stdin: ''
     }
   };
-  
-  async function fetchData() {
-    try {
-      const response = await axios.request(options);
-      res.status(200).json({ message : "code run successfully", output : response.data})
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message : 'error in run code ' , error })
-    }
-  }
-  
-  fetchData()
 
+  try {
+    const response = await axios.request(options);
+    return res.status(200).json({
+      message: "code run successfully",
+      output: response.data
+    });
+  } catch (error) {
+    console.error(error?.response?.data || error.message);
+    return res.status(500).json({
+      message: "error in run code",
+      error: error?.response?.data || error.message
+    });
+  }
 }

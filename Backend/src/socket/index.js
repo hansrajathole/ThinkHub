@@ -1,4 +1,3 @@
-
 import roomModel from "../models/room.model.js";
 import userModel from '../models/user.model.js'
 import { setSocketServer } from "./socketServer.js";
@@ -25,6 +24,7 @@ const socketHandler = (io) => {
       }
 
       socket.join(roomId);
+      socket.to(roomId).emit("userOnline", { userId, socketId: socket.id });
       console.log(`${userId} joined room ${roomId}`);
     });
 
@@ -77,9 +77,17 @@ const socketHandler = (io) => {
       socket.broadcast.to(roomId).emit("receiveMessage", newMessage );
     });
 
+    socket.on("typing", ({ roomId, isTyping, username }) => {
+      socket.to(roomId).emit("userTyping", { userId: socket.user.id, isTyping, username });
+    });
+
+    socket.on("codeTyping", ({ roomId, isCoding, username }) => {
+      socket.to(roomId).emit("userCodeTyping", { userId: socket.user.id, isCoding, username });
+    });
    
     socket.on("leaveRoom", ({ roomId }) => {
       socket.leave(roomId);
+      socket.to(roomId).emit("userOffline", { userId: socket.user.id });
       console.log(` User left room ${roomId}`);
     });
 

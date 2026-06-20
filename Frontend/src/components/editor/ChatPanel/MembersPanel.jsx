@@ -7,6 +7,7 @@ const MembersPanel = ({
   joinRequests,
   isAdmin,
   requestLoading,
+  onlineUsers,
   onReviewJoinRequest,
   onClose,
 }) => {
@@ -78,26 +79,46 @@ const MembersPanel = ({
         )}
         <h3 className="text-lg font-semibold px-2 py-2">Members:</h3>
         <div className="p-2 flex flex-col gap-2">
-          {participants?.map((user, ind) => (
-            <div
-              key={ind}
-              className="flex items-center gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 rounded shadow-sm"
-            >
-              <img
-                src={user.avatar}
-                alt="avatar"
-                className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-600"
-              />
-              <div>
-                <p className="text-sm font-semibold">{user.username}</p>
-                {user._id === currentUserId && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    (You)
+          {participants?.map((user, ind) => {
+            const isOnline = onlineUsers?.has(user._id);
+            const isCurrentUser = user._id === currentUserId;
+            return (
+              <div
+                key={ind}
+                className="flex items-center gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 rounded shadow-sm"
+              >
+                {/* Avatar with online indicator */}
+                <div className="relative flex-shrink-0">
+                  <img
+                    src={user.avatar}
+                    alt="avatar"
+                    className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-600"
+                  />
+                  {isOnline && (
+                    <span
+                      className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"
+                      title="Online"
+                    />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold flex items-center gap-1">
+                    {user.username}
+                    {isCurrentUser && (
+                      <span className="text-xs text-gray-400 font-normal">(You)</span>
+                    )}
                   </p>
-                )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {isOnline ? (
+                      <span className="text-green-500 font-medium">● Online</span>
+                    ) : (
+                      <span className="text-gray-400">○ Offline</span>
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

@@ -5,15 +5,18 @@ import { fixCode, generateCode } from "../services/aiService";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-export const useCodeEditor = (roomId, language = "") => {
+export const useCodeEditor = (roomId, username, language = "") => {
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [showRunCode, setShowRunCode] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [isFix, setisFix] = useState(false)
+  const [codingUsers, setCodingUsers] = useState({});
   const editorRef = useRef(null);
   const baseUrl = import.meta.env.VITE_BACKEND_URL
+  const codingTimeoutRef = useRef({});
+  const stopCodingTimerRef = useRef(null);
 
   useEffect(() => {
     if (!roomId) return;
@@ -39,16 +42,54 @@ export const useCodeEditor = (roomId, language = "") => {
       setCode(updatedCode);
     };
 
+    const handleUserCodeTyping = ({ userId: codingUserId, isCoding, username: codingUsername }) => {
+      if (isCoding) {
+        setCodingUsers((prev) => ({ ...prev, [codingUserId]: codingUsername }));
+        if (codingTimeoutRef.current[codingUserId]) {
+          clearTimeout(codingTimeoutRef.current[codingUserId]);
+        }
+        codingTimeoutRef.current[codingUserId] = setTimeout(() => {
+          setCodingUsers((prev) => {
+            const next = { ...prev };
+            delete next[codingUserId];
+            return next;
+          });
+        }, 1500);
+      } else {
+        setCodingUsers((prev) => {
+          const next = { ...prev };
+          delete next[codingUserId];
+          return next;
+        });
+        if (codingTimeoutRef.current[codingUserId]) {
+          clearTimeout(codingTimeoutRef.current[codingUserId]);
+          delete codingTimeoutRef.current[codingUserId];
+        }
+      }
+    };
+
     socket.on("codeUpdate", handleCodeUpdate);
+    socket.on("userCodeTyping", handleUserCodeTyping);
 
     return () => {
       socket.off("codeUpdate", handleCodeUpdate);
+      socket.off("userCodeTyping", handleUserCodeTyping);
+      Object.values(codingTimeoutRef.current).forEach(clearTimeout);
+      if (stopCodingTimerRef.current) clearTimeout(stopCodingTimerRef.current);
     };
   }, [roomId]);
 
   const handleCodeChange = (newCode) => {
     setCode(newCode);
     socket.emit("codeChange", { roomId, code: newCode });
+
+    const name = username || "Someone";
+    socket.emit("codeTyping", { roomId, isCoding: true, username: name });
+
+    if (stopCodingTimerRef.current) clearTimeout(stopCodingTimerRef.current);
+    stopCodingTimerRef.current = setTimeout(() => {
+      socket.emit("codeTyping", { roomId, isCoding: false, username: name });
+    }, 1500);
   };
 
   const handleRunCode = async (language) => {
@@ -57,10 +98,19 @@ export const useCodeEditor = (roomId, language = "") => {
     
     try {
       const result = await runCode(code, language);
-      setOutput(result.stderr || result.stdout || "No output");
+      setOutput(
+        result.compile_output ||
+        result.stderr ||
+        result.stdout ||
+        result.message ||
+        "No output"
+      );
     } catch (error) {
-      // console.error(error);
-      setOutput("Error running code.");
+      const backendMessage =
+        error?.response?.data?.error?.stderr ||
+        error?.response?.data?.error?.compile_output ||
+        error?.response?.data?.message;
+      setOutput(backendMessage || "Error running code.");
     }
   };
 
@@ -121,6 +171,7 @@ export const useCodeEditor = (roomId, language = "") => {
     handleGenerateCode,
     onEditorMount,
     isFix,
-    setisFix
+    setisFix,
+    codingUsers
   };
 };

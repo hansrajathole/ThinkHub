@@ -1,7 +1,7 @@
 export const languageMap = {
   c: 104,
   cpp: 76,
-  java: 63,
+  java: 91,
   javascript: 102,
   python: 109,
   typescript: 101,

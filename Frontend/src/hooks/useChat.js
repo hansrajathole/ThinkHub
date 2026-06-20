@@ -1,18 +1,26 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import socket from "../socket/socket";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export const useChat = (roomId, userId, onRoomAccessDenied) => {
+export const useChat = (roomId, userId, username, onRoomAccessDenied) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [showPeople, setShowPeople] = useState(false);
   const [roomData, setRoomData] = useState({});
   const [code, setCode] = useState("");
   const [requestLoading, setRequestLoading] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState(new Set([userId]));
+  const [typingUsers, setTypingUsers] = useState({});
   const messageBoxRef = useRef(null);
+  const onRoomAccessDeniedRef = useRef(onRoomAccessDenied);
+  const typingTimeoutRef = useRef({});
 
-  const baseUrl = import.meta.env.VITE_BACKEND_URL
+  const baseUrl = import.meta.env.VITE_BACKEND_URL;
+
+  useEffect(() => {
+    onRoomAccessDeniedRef.current = onRoomAccessDenied;
+  }, [onRoomAccessDenied]);
 
   // Fetch room data and messages
   useEffect(() => {
@@ -33,7 +41,7 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
         joinedRoom = true;
       } catch (error) {
         toast.error(error?.response?.data?.message || "Failed to load room data");
-        onRoomAccessDenied?.();
+        onRoomAccessDeniedRef.current?.();
       }
     };
 
@@ -44,7 +52,7 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
         socket.emit("leaveRoom", { roomId });
       }
     };
-  }, [baseUrl, onRoomAccessDenied, roomId, userId]);
+  }, [baseUrl, roomId]);
 
   // Setup message listener
   useEffect(() => {
@@ -56,7 +64,7 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
 
     const handleAccessDenied = (message) => {
       toast.error(message || "Your room access is still pending approval");
-      onRoomAccessDenied?.();
+      onRoomAccessDeniedRef.current?.();
     };
 
     const handleJoinRequestCreated = (request) => {
@@ -88,18 +96,67 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
       });
     };
 
+    // Online presence handlers
+    const handleUserOnline = ({ userId: onlineUserId }) => {
+      setOnlineUsers((prev) => new Set([...prev, onlineUserId]));
+    };
+
+    const handleUserOffline = ({ userId: offlineUserId }) => {
+      setOnlineUsers((prev) => {
+        const next = new Set(prev);
+        next.delete(offlineUserId);
+        return next;
+      });
+    };
+
+    // Typing indicator handlers
+    const handleUserTyping = ({ userId: typingUserId, isTyping, username }) => {
+      if (isTyping) {
+        setTypingUsers((prev) => ({ ...prev, [typingUserId]: username }));
+        // Auto-clear typing indicator after 3 seconds of no update
+        if (typingTimeoutRef.current[typingUserId]) {
+          clearTimeout(typingTimeoutRef.current[typingUserId]);
+        }
+        typingTimeoutRef.current[typingUserId] = setTimeout(() => {
+          setTypingUsers((prev) => {
+            const next = { ...prev };
+            delete next[typingUserId];
+            return next;
+          });
+        }, 3000);
+      } else {
+        setTypingUsers((prev) => {
+          const next = { ...prev };
+          delete next[typingUserId];
+          return next;
+        });
+        if (typingTimeoutRef.current[typingUserId]) {
+          clearTimeout(typingTimeoutRef.current[typingUserId]);
+          delete typingTimeoutRef.current[typingUserId];
+        }
+      }
+    };
+
     socket.on("receiveMessage", handleMessage);
     socket.on("roomAccessDenied", handleAccessDenied);
     socket.on("joinRequestCreated", handleJoinRequestCreated);
     socket.on("joinRequestReviewed", handleJoinRequestReviewed);
+    socket.on("userOnline", handleUserOnline);
+    socket.on("userOffline", handleUserOffline);
+    socket.on("userTyping", handleUserTyping);
 
     return () => {
       socket.off("receiveMessage", handleMessage);
       socket.off("roomAccessDenied", handleAccessDenied);
       socket.off("joinRequestCreated", handleJoinRequestCreated);
       socket.off("joinRequestReviewed", handleJoinRequestReviewed);
+      socket.off("userOnline", handleUserOnline);
+      socket.off("userOffline", handleUserOffline);
+      socket.off("userTyping", handleUserTyping);
+      // Clear all typing timeouts on cleanup
+      Object.values(typingTimeoutRef.current).forEach(clearTimeout);
     };
-  }, [onRoomAccessDenied, roomId]);
+  }, [roomId]);
 
   // Auto-scroll to bottom when new messages come in
   useEffect(() => {
@@ -107,6 +164,22 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const stopTypingTimerRef = useRef(null);
+
+  const handleInputChange = useCallback((value) => {
+    setInput(value);
+    const name = username || "Someone";
+
+    // Always emit typing:true on every keystroke so the indicator stays alive
+    socket.emit("typing", { roomId, isTyping: true, username: name });
+
+    // Reset the stop-typing timer on every keystroke
+    if (stopTypingTimerRef.current) clearTimeout(stopTypingTimerRef.current);
+    stopTypingTimerRef.current = setTimeout(() => {
+      socket.emit("typing", { roomId, isTyping: false, username: name });
+    }, 1500);
+  }, [roomId, username]);
 
   const handleSendMessage = () => {
     if (input.trim() === "") return;
@@ -118,6 +191,9 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
       sender: roomData.participants?.find(p => p._id === userId) || { _id: userId },
     };
 
+    // Stop typing indicator when message is sent
+    if (stopTypingTimerRef.current) clearTimeout(stopTypingTimerRef.current);
+    socket.emit("typing", { roomId, isTyping: false });
     socket.emit("sendMessage", { roomId, text: input });
     setMessages((prev) => [...prev, message]);
     setInput("");
@@ -153,6 +229,7 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
     input,
     code,
     setInput,
+    handleInputChange,
     showPeople,
     setShowPeople,
     roomData,
@@ -160,6 +237,8 @@ export const useChat = (roomId, userId, onRoomAccessDenied) => {
     requestLoading,
     showRequestIndicator,
     messageBoxRef,
+    onlineUsers,
+    typingUsers,
     handleSendMessage,
     handleReviewJoinRequest,
   };

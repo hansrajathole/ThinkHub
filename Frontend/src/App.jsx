@@ -1,17 +1,20 @@
-import React from 'react'
-import AppRouter from './Routes/Router'
-import Navbar from './components/Navbar/Navbar'
-import { Toaster } from 'react-hot-toast'
-import 'remixicon/fonts/remixicon.css'
+import React, { useEffect } from "react";
+import AppRouter from "./Routes/Router";
+import { Toaster } from "react-hot-toast";
+import "remixicon/fonts/remixicon.css";
+import { setupAxiosInterceptors } from "./config/axios";
 
 const App = () => {
+  useEffect(() => {
+    setupAxiosInterceptors();
+  }, []);
+
   return (
-    <div className=''>
-      {/* <Navbar/> */}
-      <AppRouter/>
+    <div className="">
+      <AppRouter />
       <Toaster position="top-right" />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
