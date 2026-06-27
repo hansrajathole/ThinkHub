@@ -11,7 +11,7 @@ const CodeEditor = ({ language, code, onChange, onMount, options = {} }) => {
     ...options
   };
 
-  const monacoTheme = document.documentElement.classList.contains('dark') ? 'vs-dark' : 'light';
+  const monacoTheme = document.documentElement.classList.contains('dark') ? 'hc-black' : 'light';
 
 
   return (

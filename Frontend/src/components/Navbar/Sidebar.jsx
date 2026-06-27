@@ -20,7 +20,6 @@ const navItems = [
   { to: "/users", icon: Users, label: "Users" },
   { to: "/rooms", icon: Layers, label: "Room" },
   { to: "/Interview-Prep", icon: BookOpen, label: "Interview Prep" },
-  { to: "/Project-Hub", icon: FolderKanban, label: "Project Hub" },
   { to: "/Road-Map-to-Tech", icon: Map, label: "Road Map to Tech" },
   { to: "/leaderboard", icon: Trophy, label: "LeaderBoard" },
 ];

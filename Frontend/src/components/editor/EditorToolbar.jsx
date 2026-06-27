@@ -101,7 +101,7 @@ const EditorToolbar = ({
           onGenerate={onGenerate}
         />
         <Button
-          className="bg-gray-700 hover:bg-gray-600 transition active:scale-95 max-sm:flex-1"
+          className="bg-gray-700 hover:bg-gray-600 dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80 transition active:scale-95 max-sm:flex-1"
           onClick={() => {
             setisFix(!isFix);
             onFix();
@@ -110,7 +110,7 @@ const EditorToolbar = ({
           {isFix ? "Fixing..." : "Fix Code"}
         </Button>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 transition max-sm:flex-1"
+          className="bg-blue-600 hover:bg-blue-700 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 transition max-sm:flex-1"
           onClick={onRun}
         >
           Run Code
