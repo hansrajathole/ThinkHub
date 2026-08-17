@@ -1,11 +1,10 @@
 import { Router } from "express";
-import * as userMiddleware from "../middleware/user.middleware.js"
-import { protectRoute } from "../middleware/protected.js"
-const router = Router()
+import { protectRoute } from "../middleware/protected.js";
+import * as adminController from "../controllers/admin.controller.js";
 
-router.get("/reports", protectRoute ,function(req,res){res.send(" Create room")})
-router.put("/users/:id/block", protectRoute ,function(req,res){res.send("block user")})
+const router = Router();
 
+router.get("/reports", protectRoute, adminController.getReports);
+router.put("/users/:id/block", protectRoute, adminController.blockUser);
 
-
-export default router
+export default router;

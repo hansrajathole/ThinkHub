@@ -57,12 +57,10 @@ export const loginUser = async function ({username , email , password}) {
     }
 
     if (!user.isVerified) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Please verify your email before logging in',
-          requireVerification: true,
-          email: user.email
-        });
+        const err = new Error('Please verify your email before logging in');
+        err.requireVerification = true;
+        err.email = user.email;
+        throw err;
       }
 
     const isMatch = await user.verifyPassword(password)

@@ -2,6 +2,8 @@ import config from "../config/config.js";
 import userModel from "../models/user.model.js";
 import jwt from 'jsonwebtoken';
 import redis from "../services/redis.service.js";
+
+
 export const protectRoute = async function (req, res, next) {
  
     try {
@@ -17,7 +19,11 @@ export const protectRoute = async function (req, res, next) {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
-        const isBlacklisted = await redis.get(`blacklist:${token}`);
+        const isBlacklisted = await redis.get(`blacklist:${token}`).catch((err) => {
+            // If Redis is unavailable, log and continue — don't block the user
+            console.warn("[protectRoute] Redis check failed, skipping blacklist:", err.message);
+            return null;
+        });
         if (isBlacklisted) {
             return res.status(401).json({ message: 'Token has been invalidated' });
         }

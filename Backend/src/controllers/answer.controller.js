@@ -25,7 +25,7 @@ export const postAnswer = async (req, res) => {
     if (user.reputation >= 500 && !user.badges.includes("Silver Badge")) {
       user.badges.push("Silver Badge");
     }
-    if (user.reputation >= 1000 && !user.badges.includes("Silver Badge")) {
+    if (user.reputation >= 1000 && !user.badges.includes("Gold Badge")) {
       user.badges.push("Gold Badge");
     }
 
@@ -66,7 +66,7 @@ export const updateAnswer = async (req, res) => {
       throw new Error("Answer content is required");
     }
 
-    const answer = await answerModel.findById(answerId);
+    let answer = await answerModel.findById(answerId);
 
     if (!answer) {
       throw new Error("Answer not found");
@@ -135,9 +135,8 @@ export const voteAnswer = async (req, res) => {
       throw new Error("userId is not found");
     }
     const answer = await answerModel.findById(id);
-    const author = await userModel.findById(answer.authorId);
-
     if (!answer) return res.status(404).json({ msg: "Answer not found" });
+    const author = await userModel.findById(answer.authorId);
 
     if (voteType !== "up" && voteType !== "down") {
       return res.status(400).json({ msg: "Invalid vote type" });
@@ -171,7 +170,7 @@ export const voteAnswer = async (req, res) => {
     if (author.reputation >= 500 && !author.badges.includes("Silver Badge")) {
       author.badges.push("Silver Badge");
     }
-    if (author.reputation >= 1000 && !author.badges.includes("Silver Badge")) {
+    if (author.reputation >= 1000 && !author.badges.includes("Gold Badge")) {
       author.badges.push("Gold Badge");
     }
 

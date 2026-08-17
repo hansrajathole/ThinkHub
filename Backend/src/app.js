@@ -60,8 +60,6 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"))
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

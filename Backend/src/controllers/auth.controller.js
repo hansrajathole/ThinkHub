@@ -50,12 +50,10 @@ export const loginController = async (req , res) => {
             return res.status(400).json({message: errors.array()[0].msg})
         }
         
-        
         const user = await userService.loginUser({
             username,
             email,
             password,
-           
         })
 
         delete user._doc.password
@@ -65,9 +63,17 @@ export const loginController = async (req , res) => {
         console.log("user logged in successfully");
         res.json({message: "User logged in successfully", token: token , user})
 
-
     } catch (error) {
         console.log("Error in loginController : ", error.message);
+        // Bug #1 fix: handle unverified-user error thrown from service
+        if (error.requireVerification) {
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+                requireVerification: true,
+                email: error.email
+            });
+        }
         res.status(500).json({ message: error.message || "Internal Server Error" });   
     }
 }
@@ -102,7 +108,7 @@ export const resendOTP = async (req, res) => {
         error: error.message 
       });
     }
-  };
+};
 
 export const meController =  async (req, res)=>{
     try {
@@ -184,7 +190,7 @@ export const forgetPasswordController = async (req, res) => {
         if (!user) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Emaii is invalid' 
+                message: 'Email is invalid' 
             });
         }
 
@@ -197,7 +203,7 @@ export const forgetPasswordController = async (req, res) => {
 
         const hashedPassword = await userModel.hashedPassword(password);
 
-        // Send OTP
+        // Update password
         await userModel.findOneAndUpdate(
             { email },
             { password: hashedPassword },
@@ -218,4 +224,3 @@ export const forgetPasswordController = async (req, res) => {
         });
     }           
 }
-

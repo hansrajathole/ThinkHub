@@ -172,8 +172,8 @@ export const voteQuestion = async (req, res) => {
         throw new Error("userId is not found")
       }
       const question = await questionModel.findById(id);
-      const author = await userModel.findById(question.authorId);
       if (!question) return res.status(404).json({ msg: "Question not found" });
+      const author = await userModel.findById(question.authorId);
   
       
       if (voteType !== "up" && voteType !== "down") {
@@ -210,7 +210,7 @@ export const voteQuestion = async (req, res) => {
       if (author.reputation >= 500 && !author.badges.includes("Silver Badge")) {
         author.badges.push("Silver Badge");
       }
-      if (author.reputation >= 1000 && !author.badges.includes("Silver Badge")) {
+      if (author.reputation >= 1000 && !author.badges.includes("Gold Badge")) {
         author.badges.push("Gold Badge");
       }
      

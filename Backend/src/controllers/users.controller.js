@@ -44,14 +44,11 @@ export const updateProfile = async (req, res) => {
         const user = await userModel.findById(userId).populate("questions").populate({
             path: "answers", 
             populate: {
-              path: "question",
+              path: "questionId",
               select: "title body tags", 
             },
           })
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
