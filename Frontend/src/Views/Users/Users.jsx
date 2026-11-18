@@ -23,13 +23,12 @@ const Users = () => {
         },
       })
         .then((response) => {
-          // console.log(response.data);
+          console.log("Users fetched:", "" + response.data);
           setUsers(response.data);
-          // console.log(users);
-          
+          console.log("Current users state:", users);
         })
         .catch((error) => {
-          // console.error("Error fetching users:", error);
+          console.error("Error fetching users:", error);
         } );
     }, [userId]);
   

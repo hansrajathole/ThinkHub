@@ -10,6 +10,7 @@ import AskQuestion from "../../Views/AskQuestion/AskQuestion";
 import { useSelector } from "react-redux";
 import SingleQuestion from "../../Views/Question/SingleQuestion";
 import Leaderboard from "../leaderboard/Leaderboard";
+import ComingSoon from "../../Views/ComingSoon/ComingSoon";
 
 const MainLayout = () => {
   const isOpen = useSelector((state) => state.sidebar.isOpen);
@@ -67,6 +68,24 @@ const MainLayout = () => {
                 <Protected>
                   <Leaderboard />
                 </Protected>
+              }
+            />
+            <Route
+              path="/Interview-Prep"
+              element={
+                <ComingSoon
+                  title="Interview Prep"
+                  description="Practice plans, curated questions, and mock interview tools are being prepared for ThinkHub."
+                />
+              }
+            />
+            <Route
+              path="/Road-Map-to-Tech"
+              element={
+                <ComingSoon
+                  title="Road Map to Tech"
+                  description="A guided path for building practical skills and planning your next move in technology is on its way."
+                />
               }
             />
           </Routes>
